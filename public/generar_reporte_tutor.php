@@ -1,9 +1,8 @@
 <?php
 session_start();
-require_once '../includes/db.php'; // Conexión a la base de datos
-require_once '../includes/functions.php'; // Funciones útiles
+require_once '../includes/db.php'; 
+require_once '../includes/functions.php';
 
-// Redirigir si el usuario no está logueado o no es un tutor
 if (!is_logged_in() || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'tutor') {
     redirect('login.php');
 }
@@ -12,7 +11,6 @@ $tutor_id = $_SESSION['user_id'];
 $tutor_nombre = $_SESSION['user_name'];
 $page_title = "Generar Reporte de Tutorías";
 
-// Inicializar variables para el formulario y el reporte
 $fecha_inicio = '';
 $fecha_fin = '';
 $report_data = [];
@@ -26,7 +24,6 @@ $report_summary = [
 $error_message = '';
 $show_report = false;
 
-// Procesar el formulario de generación de reporte
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['generar_reporte'])) {
     $fecha_inicio = sanitize_input($_POST['fecha_inicio']);
     $fecha_fin = sanitize_input($_POST['fecha_fin']);
@@ -37,8 +34,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['generar_reporte'])) {
         $error_message = "La fecha de fin no puede ser anterior a la fecha de inicio.";
     } else {
         $show_report = true;
-        // Consultar la base de datos para obtener las tutorías del tutor en el rango de fechas
-        // Usamos 'tutorías' con tilde según tu esquema de BD
         $stmt = $conn->prepare("
             SELECT 
                 t.ID_tutoria, t.fecha, t.hora, t.modalidad, t.estado_tutoria,
@@ -59,7 +54,6 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['generar_reporte'])) {
             if ($result->num_rows > 0) {
                 while ($row = $result->fetch_assoc()) {
                     $report_data[] = $row;
-                    // Actualizar el resumen
                     $report_summary['total_tutorias']++;
                     switch ($row['estado_tutoria']) {
                         case 'Programada':
@@ -78,7 +72,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['generar_reporte'])) {
                 }
             } else {
                 $error_message = "No se encontraron tutorías para el rango de fechas seleccionado.";
-                $show_report = false; // No mostrar la sección de reporte si no hay datos
+                $show_report = false;
             }
             $stmt->close();
         } else {
@@ -95,7 +89,7 @@ require_once '../includes/header.php';
     <h2>Generar Reporte de Tutorías</h2>
     <p>Selecciona un rango de fechas para generar un reporte de las tutorías que has impartido.</p>
 
-    <?php if ($error_message && !$show_report): // Mostrar error solo si no se va a mostrar el reporte ?>
+    <?php if ($error_message && !$show_report): ?>
         <p class="error-message"><?php echo htmlspecialchars($error_message); ?></p>
     <?php endif; ?>
 
@@ -159,7 +153,7 @@ require_once '../includes/header.php';
     <?php elseif ($show_report && empty($report_data)): ?>
         <p class="info-message">No se encontraron tutorías para el rango de fechas seleccionado.</p>
     <?php endif; ?>
-    <?php if ($error_message && $show_report): // Mostrar error si ocurrió durante la generación del reporte ?>
+    <?php if ($error_message && $show_report):?>
         <p class="error-message" style="margin-top: 15px;"><?php echo htmlspecialchars($error_message); ?></p>
     <?php endif; ?>
 
@@ -168,7 +162,6 @@ require_once '../includes/header.php';
 </div>
 
 <?php
-// Lógica para guardar el reporte en la tabla 'reportes' (opcional)
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['guardar_reporte_db'])) {
     $fecha_inicio_g = sanitize_input($_POST['fecha_inicio_guardar']);
     $fecha_fin_g = sanitize_input($_POST['fecha_fin_guardar']);

@@ -1,18 +1,10 @@
 <?php
-// includes/header.php
-
-// Asegúrate de iniciar la sesión. Si ya está iniciada, no hará nada.
-// Esto es crucial para acceder a $_SESSION variables.
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
 
-// Incluir el archivo de funciones.
-// __DIR__ se refiere al directorio actual del archivo (es decir, 'includes').
 require_once __DIR__ . '/functions.php';
 
-// Define $page_title ANTES de incluir este header en tus páginas,
-// o se usará un valor por defecto.
 if (!isset($page_title)) {
     $page_title = "Sistema de Tutorías Universitarias";
 }
@@ -34,8 +26,7 @@ if (!isset($page_title)) {
             <nav class="main-nav">
                 <ul>
                     <li><a href="index.php">Inicio</a></li>
-                    <?php if (is_logged_in()): // Verifica si el usuario ha iniciado sesión ?>
-                        <?php // Enlaces para usuarios logueados ?>
+                    <?php if (is_logged_in()): ?>
                         <?php if (isset($_SESSION['user_role'])): ?>
                             <?php if ($_SESSION['user_role'] == 'estudiante'): ?>
                                 <li><a href="dashboard_estudiante.php">Mi Dashboard</a></li>
@@ -43,20 +34,18 @@ if (!isset($page_title)) {
                                 <li><a href="dashboard_tutor.php">Mi Dashboard</a></li>
                             <?php endif; ?>
                         <?php endif; ?>
-                        <li><a href="perfil.php">Mi Perfil</a></li> <?php // Enlace a una futura página de perfil ?>
+                        <li><a href="perfil.php">Mi Perfil</a></li> 
                         <li>
                             <a href="logout.php">Cerrar Sesión</a>
                         </li>
                     <?php else: ?>
-                        <?php // Enlaces para usuarios no logueados ?>
                         <li><a href="login.php">Iniciar Sesión</a></li>
                         <li><a href="register.php">Registrarse</a></li>
                     <?php endif; ?>
-                    </ul>
+                </ul>
             </nav>
         </div>
     </header>
 
     <main class="content">
         <div class="container">
-            

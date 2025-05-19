@@ -1,34 +1,31 @@
 <?php
-// public/dashboard_tutor.php
 session_start();
-require_once '../includes/db.php'; // Conexión a la base de datos
-require_once '../includes/functions.php'; // Funciones útiles
+require_once '../includes/db.php';
+require_once '../includes/functions.php';
 
-// Redirigir si el usuario no está logueado o no es un tutor
 if (!is_logged_in() || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'tutor') {
     redirect('login.php');
 }
 
 $tutor_id = $_SESSION['user_id'];
-$tutor_nombre = $_SESSION['user_name'] ?? 'Tutor'; // Usar 'Tutor' como nombre por defecto si no está en sesión
+$tutor_nombre = $_SESSION['user_name'] ?? 'Tutor';
 
 $page_title = "Dashboard del Tutor";
-$active_page = 'dashboard_tutor'; // Para el sidebar
+$active_page = 'dashboard_tutor';
 
-require_once '../includes/header.php'; // Incluye el encabezado
+require_once '../includes/header.php';
 ?>
 
-<div class="page-container" style="display: flex;">
-    <?php require_once '../includes/sidebar_tutor.php'; // Incluye el sidebar del tutor ?>
+<div class="page-container">
+    <?php require_once '../includes/sidebar_tutor.php';?>
 
-    <div class="main-content-area" style="flex-grow: 1; padding: 20px;">
-        <div class="dashboard-container">
-            <h2>Bienvenido, Tutor <?php echo htmlspecialchars($tutor_nombre); ?>!</h2>
+    <div class="main-content-area">
+        <div class="dashboard-container"> <h2>Bienvenido, Tutor <?php echo htmlspecialchars($tutor_nombre); ?>!</h2>
             <p>Este es tu panel de control donde puedes gestionar tus tutorías.</p>
 
             <h3>Tutorías Próximas Asignadas</h3>
             <?php
-            // Consulta SQL ajustada para coincidir con las columnas de la tabla 'tutorías' en tutorias.sql
+
             $stmt_proximas_tutorias_tutor = $conn->prepare("
                 SELECT
                     t.ID_tutoria, t.fecha, t.hora, t.modalidad, t.estado_tutoria,
@@ -54,7 +51,6 @@ require_once '../includes/header.php'; // Incluye el encabezado
 
                 if ($result_proximas_tutorias_tutor->num_rows > 0) {
                     echo '<table class="data-table">';
-                    // Se elimina la columna "Lugar/Enlace" ya que no está en la tabla 'tutorías'
                     echo '<thead><tr><th>Estudiante</th><th>Materia</th><th>Fecha</th><th>Hora</th><th>Modalidad</th><th>Estado</th><th>Acciones</th></tr></thead>';
                     echo '<tbody>';
                     while ($row = $result_proximas_tutorias_tutor->fetch_assoc()) {
@@ -66,9 +62,8 @@ require_once '../includes/header.php'; // Incluye el encabezado
                         echo '<td>' . htmlspecialchars($row['modalidad']) . '</td>';
                         echo '<td>' . htmlspecialchars($row['estado_tutoria']) . '</td>';
                         echo '<td>';
-                        // Asegúrate que detalle_tutoria.php use id_tutoria como parámetro si así lo espera
-                        echo '<a href="detalle_tutoria.php?id_tutoria=' . $row['ID_tutoria'] . '" class="button small">Ver Detalles</a> ';
-                        if ($row['estado_tutoria'] == 'Programada' || $row['estado_tutoria'] == 'Completada') {
+                        echo '<a href="detalle_tutoria.php?id=' . $row['ID_tutoria'] . '" class="button small">Ver Detalles</a> ';
+                        if ($row['estado_tutoria'] == 'Programada' || $row['estado_tutoria'] == 'Completada' || $row['estado_tutoria'] == 'Reprogramada') {
                             echo '<a href="registro_avance.php?id_tutoria=' . $row['ID_tutoria'] . '" class="button small success">Registrar Avance</a>';
                         }
                         echo '</td>';
@@ -81,7 +76,6 @@ require_once '../includes/header.php'; // Incluye el encabezado
                 }
                 $stmt_proximas_tutorias_tutor->close();
             } else {
-                 // Mostrar error de MySQL si la preparación de la consulta falla
                  echo '<p class="error-message">Error al preparar la consulta de próximas tutorías: ' . htmlspecialchars($conn->error) . '</p>';
             }
             ?>
@@ -92,9 +86,12 @@ require_once '../includes/header.php'; // Incluye el encabezado
                 <a href="ver_tutorias_tutor.php" class="button">Ver Todas Mis Tutorías</a>
                 <a href="generar_reporte_tutor.php" class="button">Generar Reportes</a>
                 <a href="gestionar_materias.php" class="button">Gestionar Materias</a>
+                <a href="perfil.php" class="button">Mi Perfil</a>
             </div>
         </div>
-    </div> </div> <?php
-$conn->close(); // Cerrar la conexión a la base de datos
-require_once '../includes/footer.php'; // Incluye el pie de página
+    </div> 
+</div> 
+<?php
+$conn->close();
+require_once '../includes/footer.php';
 ?>

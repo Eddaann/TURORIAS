@@ -1,10 +1,8 @@
 <?php
-// public/historial_tutorias_estudiante.php
 session_start();
-require_once '../includes/db.php'; // Conexión a la base de datos
-require_once '../includes/functions.php'; // Funciones útiles
+require_once '../includes/db.php'; 
+require_once '../includes/functions.php';
 
-// Redirigir si el usuario no está logueado o no es un estudiante
 if (!is_logged_in() || !isset($_SESSION['user_role']) || $_SESSION['user_role'] !== 'estudiante') {
     redirect('login.php');
 }
@@ -13,8 +11,7 @@ $estudiante_id = $_SESSION['user_id'];
 $estudiante_nombre = $_SESSION['user_name'];
 $page_title = "Historial Completo de Tutorías";
 
-// Configuración de paginación
-$results_per_page = 10; // Número de tutorías por página
+$results_per_page = 10; 
 if (isset($_GET['page']) && is_numeric($_GET['page'])) {
     $current_page = (int)$_GET['page'];
 } else {
@@ -26,7 +23,6 @@ $tutorias = [];
 $total_tutorias = 0;
 $error_message = '';
 
-// Contar el total de tutorías para el estudiante (para la paginación)
 $stmt_count = $conn->prepare("SELECT COUNT(*) FROM tutorías WHERE ID_estudiante = ?");
 if ($stmt_count) {
     $stmt_count->bind_param("i", $estudiante_id);
@@ -40,10 +36,8 @@ if ($stmt_count) {
 
 $total_pages = ceil($total_tutorias / $results_per_page);
 
-// Obtener las tutorías para la página actual
+
 if ($total_tutorias > 0 && empty($error_message)) {
-    // Usamos 'tutorías' con tilde según tu esquema de BD.
-    // Omitimos 'enlace_o_lugar' ya que no está en el DDL de tutorías y es un historial.
     $stmt_tutorias = $conn->prepare("
         SELECT 
             t.ID_tutoria, t.fecha, t.hora, t.modalidad, t.estado_tutoria,

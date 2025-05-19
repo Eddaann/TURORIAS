@@ -24,14 +24,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['solicitar_tutoria_subm
     $fecha_tutoria = sanitize_input($_POST['fecha_tutoria']);
     $hora_tutoria = sanitize_input($_POST['hora_tutoria']);
     $modalidad = sanitize_input($_POST['modalidad']);
-    // $notas_estudiante = isset($_POST['notas_estudiante']) ? sanitize_input($_POST['notas_estudiante']) : null; // Opcional
+    // (Opcional) Campo para notas del estudiante
+    $notas_estudiante = isset($_POST['notas_estudiante']) ? sanitize_input($_POST['notas_estudiante']) : null;
 
-    // Estado inicial para una nueva solicitud.
-    // Tu ENUM actual es ('Programada','Completada','Cancelada','Reprogramada').
-    // 'Programada' implica que ya está confirmada. Si quieres un paso de aprobación por el tutor,
-    // necesitarías añadir un estado como 'Solicitada' a tu ENUM en la tabla 'tutorías'.
-    // Por ahora, la crearemos como 'Programada'.
-    $estado_tutoria = "Programada";
+    // Nuevo estado inicial para una solicitud
+    $estado_tutoria = "Solicitada"; // Cambiado de "Programada"
 
     // Validaciones básicas
     if (empty($id_materia) || empty($id_tutor) || empty($fecha_tutoria) || empty($hora_tutoria) || empty($modalidad)) {
@@ -42,19 +39,30 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['solicitar_tutoria_subm
         $error_message = "Modalidad no válida.";
     } else {
         // Preparar la inserción en la base de datos
-        // La tabla 'tutorías' según tu DDL no tiene 'enlace_o_lugar' ni 'notas_adicionales'
-        $stmt_insert_tutoria = $conn->prepare(
-            "INSERT INTO tutorías (ID_estudiante, ID_tutor, ID_materia, fecha, hora, modalidad, estado_tutoria) 
-             VALUES (?, ?, ?, ?, ?, ?, ?)"
-        );
+        // Ajusta el SQL si añadiste 'notas_estudiante'
+        if ($notas_estudiante !== null) { // Asumiendo que añadiste la columna notas_estudiante
+            $sql_insert = "INSERT INTO tutorías (ID_estudiante, ID_tutor, ID_materia, fecha, hora, modalidad, estado_tutoria, notas_estudiante) 
+                           VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
+            $bind_types = "iiisssss";
+            $bind_params_array = [$estudiante_id, $id_tutor, $id_materia, $fecha_tutoria, $hora_tutoria, $modalidad, $estado_tutoria, $notas_estudiante];
+        } else {
+            $sql_insert = "INSERT INTO tutorías (ID_estudiante, ID_tutor, ID_materia, fecha, hora, modalidad, estado_tutoria) 
+                           VALUES (?, ?, ?, ?, ?, ?, ?)";
+            $bind_types = "iiissss";
+            $bind_params_array = [$estudiante_id, $id_tutor, $id_materia, $fecha_tutoria, $hora_tutoria, $modalidad, $estado_tutoria];
+        }
+        
+        $stmt_insert_tutoria = $conn->prepare($sql_insert);
 
         if ($stmt_insert_tutoria) {
-            $stmt_insert_tutoria->bind_param("iiissss", $estudiante_id, $id_tutor, $id_materia, $fecha_tutoria, $hora_tutoria, $modalidad, $estado_tutoria);
+            // El primer argumento de bind_param es la cadena de tipos, los siguientes son las variables.
+            // Usamos el operador de propagación (...) para pasar el array de parámetros.
+            $stmt_insert_tutoria->bind_param($bind_types, ...$bind_params_array);
 
             if ($stmt_insert_tutoria->execute()) {
-                $success_message = "Tutoría solicitada (y programada) exitosamente. El tutor ha sido notificado (simulado).";
-                // Opcional: Limpiar los campos o redirigir
-                // redirect('dashboard_estudiante.php'); 
+                $success_message = "Tutoría solicitada exitosamente. Está pendiente de aprobación por el tutor.";
+                // Opcional: Limpiar los campos del formulario después de un envío exitoso
+                $_POST = array(); 
             } else {
                 $error_message = "Error al solicitar la tutoría: " . $stmt_insert_tutoria->error;
             }
@@ -87,11 +95,31 @@ if ($result_tutores && $result_tutores->num_rows > 0) {
     }
 }
 
+// Corregir el nombre del archivo del sidebar si es necesario
+// Si el archivo se llama 'siderbar_estudiante.php', usa ese nombre.
+// Si lo has corregido a 'sidebar_estudiante.php', usa el nombre corregido.
+$sidebar_file = '../includes/siderbar_estudiante.php'; // o sidebar_estudiante.php
+if (!file_exists($sidebar_file)) {
+    // Intenta con el nombre corregido como fallback o maneja el error
+    $sidebar_file = '../includes/sidebar_estudiante.php'; 
+}
+
+
 require_once '../includes/header.php'; // Incluir el encabezado
 ?>
 
 <div class="page-container" style="display: flex;">
-    <?php require_once '../includes/sidebar_estudiante.php'; // Incluye el sidebar del estudiante ?>
+    <?php 
+    // Asegúrate de que el archivo de la barra lateral exista y sea el correcto.
+    // El nombre original en el análisis previo era 'siderbar_estudiante.php'
+    if (file_exists('../includes/siderbar_estudiante.php')) {
+        require_once '../includes/siderbar_estudiante.php'; 
+    } elseif (file_exists('../includes/sidebar_estudiante.php')) { // Intenta con el nombre corregido
+        require_once '../includes/sidebar_estudiante.php';
+    } else {
+        echo '<aside style="width: 250px; padding: 15px; background-color: #f8f9fa; border-right: 1px solid #dee2e6;"><p>Error: Sidebar no encontrado.</p></aside>';
+    }
+    ?>
 
     <div class="main-content-area" style="flex-grow: 1; padding: 20px;">
         <div class="dashboard-container"> <h2>Solicitar Nueva Tutoría</h2>
@@ -155,13 +183,25 @@ require_once '../includes/header.php'; // Incluir el encabezado
                     </select>
                 </div>
 
+                <?php // (Opcional) Campo para notas del estudiante ?>
+                <?php if (true): /* Cambia a true si añadiste la columna notas_estudiante y quieres usar el campo */ ?>
+                <div>
+                    <label for="notas_estudiante">Notas para el Tutor (opcional):</label>
+                    <textarea id="notas_estudiante" name="notas_estudiante" rows="3" placeholder="Ej: Temas específicos a tratar, dudas principales..."><?php echo isset($_POST['notas_estudiante']) ? htmlspecialchars($_POST['notas_estudiante']) : ''; ?></textarea>
+                </div>
+                <?php endif; ?>
+
+
                 <button type="submit" name="solicitar_tutoria_submit">Enviar Solicitud de Tutoría</button>
             </form>
             
             <p style="margin-top: 30px;">
                 <a href="dashboard_estudiante.php" class="button">Volver al Dashboard</a>
             </p>
-        </div> </div> </div> <?php
+        </div> 
+    </div> 
+</div> 
+<?php
 $conn->close(); // Cerrar la conexión a la base de datos
 require_once '../includes/footer.php'; // Incluir el pie de página
 ?>
