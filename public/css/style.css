@@ -1,0 +1,293 @@
+/* public/css/style.css */
+
+/* --- General Layout & Container --- */
+body {
+    font-family: Arial, sans-serif;
+    background-color: #f4f4f4;
+    display: flex;
+    flex-direction: column; /* Cambiado a columna para el layout general */
+    min-height: 100vh; /* Ocupa el 100% de la altura de la vista */
+    margin: 0;
+    justify-content: center; /* Centra el contenido verticalmente en la página principal */
+    align-items: center;   /* Centra el contenido horizontalmente en la página principal */
+}
+
+/* Contenedor principal que envuelve el contenido de las páginas */
+.container {
+    width: 100%;
+    max-width: 960px; /* Ancho máximo para el contenido principal por defecto */
+    margin: 0 auto; /* Centrar el contenedor */
+    padding: 0 20px; /* Padding a los lados */
+    box-sizing: border-box; /* Incluir padding en el ancho total */
+}
+
+/* Estilos específicos para el contenedor de la página de bienvenida (index.php) */
+.welcome-container {
+    background-color: #fff;
+    padding: 40px;
+    border-radius: 8px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+    max-width: 500px; /* Ancho específico para el contenedor de bienvenida */
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    margin: 20px auto; /* Para centrarlo si el body no tiene flex completo */
+}
+
+.welcome-container h1 {
+    color: #333;
+    margin-bottom: 30px;
+}
+
+.welcome-container .button-group {
+    display: flex;
+    flex-direction: column; /* Botones apilados */
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.welcome-container .button-group .welcome-button {
+    background-color: #007bff;
+    color: white;
+    padding: 15px 25px;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    cursor: pointer;
+    text-decoration: none; /* Para los enlaces */
+    transition: background-color 0.3s ease;
+}
+
+.welcome-container .button-group .welcome-button:hover {
+    background-color: #0056b3;
+}
+
+
+/* --- Header Styles --- */
+.main-header {
+    background-color: #007bff;
+    color: white;
+    padding: 15px 0;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    width: 100%; /* Asegura que ocupe todo el ancho */
+}
+
+.main-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.main-header .logo a {
+    color: white;
+    text-decoration: none;
+    font-size: 24px;
+    font-weight: bold;
+}
+
+.main-header .main-nav ul {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    gap: 20px;
+}
+
+.main-header .main-nav ul li a {
+    color: white;
+    text-decoration: none;
+    padding: 8px 12px;
+    border-radius: 4px;
+    transition: background-color 0.3s ease;
+}
+
+.main-header .main-nav ul li a:hover {
+    background-color: #0056b3;
+}
+
+/* --- Main Content Area --- */
+.content {
+    flex-grow: 1; /* Esto hará que el contenido ocupe todo el espacio disponible */
+    padding: 20px 0;
+}
+
+/* --- Footer Styles --- */
+.main-footer {
+    background-color: #333;
+    color: white;
+    padding: 20px 0;
+    text-align: center;
+    margin-top: auto; /* Empuja el footer al final si el contenido es corto */
+    width: 100%; /* Asegura que ocupe todo el ancho */
+}
+
+.main-footer a {
+    color: #87ceeb; /* Color de enlace en el footer */
+    text-decoration: none;
+}
+
+.main-footer a:hover {
+    text-decoration: underline;
+}
+
+/* --- Form Styles (para login.php y register.php) --- */
+.form-container {
+    background-color: #fff;
+    padding: 30px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 600px; /* Ancho específico para formularios */
+    text-align: center;
+    margin: 20px auto; /* Centrarlo */
+}
+
+.form-container h1, .form-container h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+label {
+    text-align: left;
+    font-weight: bold;
+    color: #666;
+}
+
+input[type="text"],
+input[type="email"],
+input[type="password"],
+input[type="date"], /* Añadido para campos de fecha */
+select, /* Añadido para selectores */
+textarea { /* Añadido para áreas de texto */
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    box-sizing: border-box;
+}
+
+button[type="submit"] { /* Específico para botones de submit */
+    background-color: #007bff;
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: background-color 0.3s ease;
+}
+
+button[type="submit"]:hover {
+    background-color: #0056b3;
+}
+
+p {
+    margin-top: 15px;
+    font-size: 14px;
+}
+
+/* Estilos para mensajes de error/éxito */
+p.error-message {
+    color: red;
+    background-color: #ffe0e0;
+    border: 1px solid red;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+p.success-message {
+    color: green;
+    background-color: #e0ffe0;
+    border: 1px solid green;
+    padding: 10px;
+    border-radius: 5px;
+    margin-bottom: 15px;
+}
+
+/* Añade estos estilos al final de tu existing public/css/style.css */
+
+/* --- Dashboard Specific Styles --- */
+.dashboard-container {
+    padding: 30px;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    margin-bottom: 20px; /* Espacio debajo de cada sección de dashboard */
+}
+
+.dashboard-container h2 {
+    color: #333;
+    margin-bottom: 20px;
+}
+
+.dashboard-container h3 {
+    color: #555;
+    margin-top: 30px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.button-group-dashboard {
+    display: flex;
+    flex-wrap: wrap; /* Permite que los botones se envuelvan en pantallas pequeñas */
+    gap: 15px;
+    margin-top: 20px;
+}
+
+.button-group-dashboard .button {
+    background-color: #28a745; /* Un color diferente para los botones de acción */
+    color: white;
+    padding: 12px 20px;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 16px;
+    text-decoration: none;
+    transition: background-color 0.3s ease;
+}
+
+.button-group-dashboard .button:hover {
+    background-color: #218838;
+}
+
+.button.small { /* Para botones dentro de tablas */
+    padding: 6px 10px;
+    font-size: 13px;
+}
+
+/* --- Table Styles --- */
+.data-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.data-table th,
+.data-table td {
+    border: 1px solid #ddd;
+    padding: 10px;
+    text-align: left;
+}
+
+.data-table th {
+    background-color: #f2f2f2;
+    color: #333;
+    font-weight: bold;
+}
+
+.data-table tbody tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+.data-table tbody tr:hover {
+    background-color: #f1f1f1;
+}
